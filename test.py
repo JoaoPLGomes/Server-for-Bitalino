@@ -21,11 +21,8 @@ def enviar_info() :
 	# Set battery threshold
 	#print device.battery(batteryThreshold)
 
-	# Read BITalino version
-	device.version()
-	
 
-	info = device.state()
+	info = device.version()
 
 # Stop acquisition
 	device.stop()

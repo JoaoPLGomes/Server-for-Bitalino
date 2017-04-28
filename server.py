@@ -28,16 +28,17 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 			self.write_message("Herro: " + message)
 
 		else :
-			self.write_message('' + str(test.enviar_info()))
+			try:
+				self.write_message('' + str(test.enviar_info()))
+			except IOError as e:
+				print e
+				self.write_message('Ocorreu um erro de ligacao: ' + str(e))
+			
 
-
-	def on_receive(self):
-		print '' + enviar_info()
-		self.write_message('' + enviar_info())
 
 	def on_close(self):
 		self.connections.remove(self)
-		print 'Conn closed...'.
+		print 'Conn closed...'
 
 application = tornado.web.Application([
 	(r'/ws', WSHandler),
