@@ -9,8 +9,9 @@
         min-width: 500px;
       }
     </style>
-    <script src="http://code.jquery.com/jquery.min.js"></script>
-    <script>
+    <script language="javascript" type="text/javascript" src="jquery.js"></script> 
+    <script language="javascript" type="text/javascript" src="jquery.flot.js"></script> 
+    <script type="text/javascript">
  
       // log function
       log = function(data){
@@ -36,7 +37,14 @@
           // Handle incoming websocket message callback
           ws.onmessage = function(evt) {
             log("Message Received: " + evt.data)
-            alert("message received: " + evt.data);
+
+            var d1 = [];
+                for (var i = 0; i < evt.data.length; i += 1)
+                    d1.push([i, evt.data[i]]);
+                
+                $.plot($("#placeholder"), [ d1 ], {yaxis: {
+              min:0, max: 1024}});
+            
             };
  
           // Close Websocket callback
@@ -93,6 +101,10 @@
         <input type="submit" id="send" value="send" />
         <input type="submit" id="receber" value="receber" />
     </div>
+
+    <div><h1>BITalinoWS</h1></div>
+    <div id="placeholder" style="width:600px;height:300px;"></div> 
+
     <div id="terminal">
         
     </div>

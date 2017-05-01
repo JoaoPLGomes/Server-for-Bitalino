@@ -5,6 +5,7 @@ import tornado.web
 import socket, test
 from tornado import gen
 import threading
+from random import randint
 '''
 This is a simple Websocket Echo server that uses the Tornado websocket handler.
 Please run `pip install tornado` with python of version 2.7.9 or greater to install tornado.
@@ -56,9 +57,10 @@ def read_function():
     	if len(connections) >= 1:
 			
         	data = test.info_loop()
-        	print data
+        	#test_data = [x[0] + randint(0,800) for x in data]
+        	#print test_data
         
-        	[client.write_message(data) for client in connections]
+        	[client.write_message(str(data)) for client in connections]
 
 
 application = tornado.web.Application([
