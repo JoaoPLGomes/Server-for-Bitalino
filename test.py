@@ -3,17 +3,17 @@ import bitalino, time
 
 
 
-def enviar_info() :
+def info_loop() :
 	info = ''
 	# This example will collect data for 5 sec.
 	macAddress = "20:15:05:29:21:00"
-	'''running_time = 5
+	running_time = 0.5
     
 	batteryThreshold = 30
 	acqChannels = [0, 1, 2, 3, 4, 5]
 	samplingRate = 1000
-	nSamples = 10
-	digitalOutput = [1,1]'''
+	nSamples = 15
+	digitalOutput = [1,1]
 
 	# Connect to BITalino
 	device = bitalino.BITalino(macAddress)
@@ -22,15 +22,10 @@ def enviar_info() :
 	#print device.battery(batteryThreshold)
 
 
-	info = device.version()
+	
 
-# Stop acquisition
-	device.stop()
-    
-# Close connection
-	device.close()
-	return info
-	'''
+
+	
 
 	# Start Acquisition
 	device.start(samplingRate, acqChannels)
@@ -40,8 +35,18 @@ def enviar_info() :
 	
 
 
-	while (end - start) < running_time:
+	while  (end - start) < running_time:
 		# Read samples
-		print device.read(nSamples)
+		info += str(device.read(nSamples))
+		
 		end = time.time()
-	'''
+	
+	# Stop acquisition
+	device.stop()
+    
+	# Close connection
+	device.close()
+	
+	return info
+
+

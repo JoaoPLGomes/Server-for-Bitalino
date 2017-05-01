@@ -3,6 +3,7 @@ import tornado.websocket
 import tornado.ioloop
 import tornado.web
 import socket, test
+from tornado import gen
 '''
 This is a simple Websocket Echo server that uses the Tornado websocket handler.
 Please run `pip install tornado` with python of version 2.7.9 or greater to install tornado.
@@ -10,18 +11,24 @@ This program will echo back the reverse of whatever it recieves.
 Messages are output to the terminal for debuggin purposes. 
 ''' 
 
-
+connections = set()
 class WSHandler(tornado.websocket.WebSocketHandler):
-	connections = set()
+	
+	
 
 	def check_origin(self, origin):
 		return True
 
 	def open(self):
-		self.connections.add(self)
+		connections.add(self)
 		print 'New connection was opened'
-		self.write_message("Conn!")
+		if len(connections) == 1:
+			read_function()
+		else :
+			self.write_message("Conn!")
 
+
+	
 	def on_message(self, message):
 		if message == ' receber':
 			print  message
@@ -32,13 +39,24 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 				self.write_message('' + str(test.enviar_info()))
 			except IOError as e:
 				print e
-				self.write_message('Ocorreu um erro de ligacao: ' + str(e))
+				self.write_message('Connection Error: ' + str(e))
 			
 
 
 	def on_close(self):
-		self.connections.remove(self)
+		connections.remove(self)
 		print 'Conn closed...'
+
+
+
+
+def read_function():
+    while True:
+        data = test.info_loop()
+        print data
+        
+        [client.write_message(data) for client in connections]
+
 
 application = tornado.web.Application([
 	(r'/ws', WSHandler),
