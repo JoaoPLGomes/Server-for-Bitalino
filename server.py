@@ -6,6 +6,15 @@ import socket, test
 from tornado import gen
 import threading
 from random import randint
+import bitalino
+
+
+macAddress = "20:15:05:29:21:00"
+acqChannels = [0, 1, 2, 3, 4, 5]
+samplingRate = 1000
+nSamples = 250
+digitalOutput = [1,1]
+
 '''
 This is a simple Websocket Echo server that uses the Tornado websocket handler.
 Please run `pip install tornado` with python of version 2.7.9 or greater to install tornado.
@@ -14,6 +23,7 @@ Messages are output to the terminal for debuggin purposes.
 ''' 
 threads = [] #Array with threads
 connections = set() #Clients that are connected
+device = bitalino.BITalino(macAddress)
 
 class WSHandler(tornado.websocket.WebSocketHandler):
 	
@@ -47,20 +57,23 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 	def on_close(self):
 		connections.remove(self)
 		print 'Conn closed...'
-
-
+		if len(connections) == 0:
+			device.stop()
+			
 
 
 def read_function():
     while True:
-
+    	
     	if len(connections) >= 1:
+
+    		if not device.started :
+    			device.start(samplingRate,acqChannels)
 			
-        	data = test.info_loop()
-        	#test_data = [x[0] + randint(0,800) for x in data]
-        	#print test_data
-        
+        	data = test.info_loop(device,nSamples)
+        	
         	[client.write_message(str(data)) for client in connections]
+        	
 
 
 application = tornado.web.Application([
@@ -74,7 +87,16 @@ if __name__ == "__main__":
 	t = threading.Thread(target=read_function)
 	threads.append(t)
 	t.start()
+	
 	tornado.ioloop.IOLoop.instance().start()
+	print "Server On"
+
 
 
 #[con.write_message('Hi!') for con in self.connections] -- Para enviar mensagens para todos os clientes !
+
+
+
+
+        
+
