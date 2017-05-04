@@ -23,7 +23,9 @@ Messages are output to the terminal for debuggin purposes.
 ''' 
 threads = [] #Array with threads
 connections = set() #Clients that are connected
-device = bitalino.BITalino(macAddress)
+device = ""
+toStop = False
+
 
 class WSHandler(tornado.websocket.WebSocketHandler):
 	
@@ -41,38 +43,61 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 	
 	def on_message(self, message):
-		if message == ' receber':
-			print  message
-			self.write_message("Herro: " + message)
 
-		else :
-			try:
-				self.write_message('' + str(test.enviar_info()))
-			except IOError as e:
-				print e
-				self.write_message('Connection Error: ' + str(e))
+		try:
+			self.write_message(message)
+		except IOError as e:
+			print e
+			self.write_message('Connection Error: ' + str(e))
 			
 
 
 	def on_close(self):
 		connections.remove(self)
 		print 'Conn closed...'
-		if len(connections) == 0:
-			device.stop()
+		
+		if len(connections) == 0 and type(device) == bitalino.BITalino:
+			
+			global toStop 
+			toStop = True
+			
 			
 
 
 def read_function():
-    while True:
-    	
-    	if len(connections) >= 1:
-
-    		if not device.started :
-    			device.start(samplingRate,acqChannels)
+	global toStop
+	global device
+	
+	while True:
+		
+		if toStop :
 			
-        	data = test.info_loop(device,nSamples)
-        	
-        	[client.write_message(str(data)) for client in connections]
+			device.stop()
+			toStop = False
+
+		elif len(connections) >= 1:
+
+			if not type(device) == bitalino.BITalino :
+				
+				try :
+					device = bitalino.BITalino(macAddress)
+				except Exception as e:
+					[client.write_message(str(e)) for client in connections]
+			 				
+				
+			else :
+				try:
+					if not device.started :
+
+						device.start(samplingRate,acqChannels)
+					
+					data = device.read(nSamples)
+
+					[client.write_message(str(data)) for client in connections]
+        			
+				except Exception as e:
+					[client.write_message(str(e)) for client in connections]
+    			
         	
 
 
@@ -84,19 +109,12 @@ application = tornado.web.Application([
 if __name__ == "__main__":
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(65)
+
 	t = threading.Thread(target=read_function)
 	threads.append(t)
 	t.start()
-	
-	tornado.ioloop.IOLoop.instance().start()
 	print "Server On"
-
-
-
-#[con.write_message('Hi!') for con in self.connections] -- Para enviar mensagens para todos os clientes !
-
-
-
+	tornado.ioloop.IOLoop.instance().start()
 
         
 
