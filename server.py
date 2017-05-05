@@ -10,11 +10,11 @@ import bitalino
 import json
 
 
-macAddress = "20:15:05:29:21:00"
-acqChannels = [0,1,2,3,4,5]
-samplingRate = 1000
-nSamples = 250
-digitalOutput = [1,1]
+macAddress = ""
+acqChannels = []
+samplingRate = 0
+nSamples = 0
+digitalOutput = []
 
 '''
 This is a simple Websocket Echo server that uses the Tornado websocket handler.
@@ -55,18 +55,12 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		connections.remove(self)
 		print 'Conn closed...'
 		
-		if len(connections) == 0 and type(device) == bitalino.BITalino:
+		if len(connections) == 0:
 			
 			global toStop 
 			toStop = True
-			
-def ensure_str(s):
-    if isinstance(s, unicode):
-        s = s.encode('utf-8')
-    return s
 
-
-			
+		
 def getJsonInfo():
 
 	global macAddress
@@ -78,17 +72,33 @@ def getJsonInfo():
 
 	with open('variables.json') as data_file:    
 		data = json.load(data_file)
-		macAddress = data["Bitalino"]["macAddress"]
-
-		for i in data["Bitalino"]["acqChannels"] :
-			acqChannels.append(int(i))
-
-		samplingRate =data["Bitalino"]["samplingRate"]
-		nSamples = data["Bitalino"]["nSamples"]
-		for i in data["Bitalino"]["digitalOutput"] :
-			digitalOutput.append(int(i))
+		for a in data :
+			macAddress = a
+			break
 
 		
+		
+
+		for i in data[macAddress]["acqChannels"] :
+			acqChannels.append(i-1)
+
+		samplingRate =data[macAddress]["samplingRate"]
+		nSamples = data[macAddress]["nSamples"]
+		for i in data[macAddress]["digitalOutput"] :
+			digitalOutput.append(int(i))
+
+
+def stopDevice():
+	global device 
+	if device.started :
+		try:
+			device.stop()
+		except Exception as e:
+			close()
+			device = ""
+	else:	
+		device.close()
+		device = ""
 
 def read_function():
 	global toStop
@@ -99,7 +109,7 @@ def read_function():
 		
 		if toStop :
 			
-			device.stop()
+			stopDevice()
 			toStop = False
 
 		elif len(connections) >= 1:
@@ -119,6 +129,8 @@ def read_function():
 				try:
 					if not device.started :
 						print "here 1 "
+						print samplingRate
+						print acqChannels
 						device.start(samplingRate,acqChannels)
 						print "here 2"
 					data = device.read(nSamples)
@@ -126,6 +138,8 @@ def read_function():
 					[client.write_message(str(data)) for client in connections]
 
 				except Exception as e:
+					print "ERRO"
+					toStop = True
 					[client.write_message(str(e)) for client in connections]
 
 
@@ -135,16 +149,12 @@ application = tornado.web.Application([
  
 
 if __name__ == "__main__":
-	#getJsonInfo()
+	getJsonInfo()
+	
 	http_server = tornado.httpserver.HTTPServer(application)
 	http_server.listen(65)
 	t = threading.Thread(target=read_function)
 	threads.append(t)
 	t.start()
-	print macAddress
-	print acqChannels
-	print samplingRate
-	print nSamples
-	print digitalOutput
 	print "Server On"
 	tornado.ioloop.IOLoop.instance().start()
