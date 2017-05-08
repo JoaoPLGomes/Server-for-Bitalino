@@ -92,7 +92,7 @@ function closeNav() {
       // log function
       log = function(data){
         $("div#terminal").prepend("</br>" +data);
-        console.log(data);
+       // console.log(String(data));
       };
  
       $(document).ready(function () {
@@ -113,10 +113,13 @@ function closeNav() {
           // Handle incoming websocket message callback
           ws.onmessage = function(evt) {
             log("Message Received: " + evt.data)
-
+            
+            var dados = evt.data.split(',')
+            console.log( dados[5])
             var d1 = [];
-                for (var i = 0; i < evt.data.length; i += 1)
-                    d1.push([i, evt.data[i]]);
+                for (var i = 0; i < dados.length; i += 1)
+                    
+                    d1.push([i, dados[5]]);
                 
                 $.plot($("#placeholder"), [ d1 ], {yaxis: {
               min:0, max: 1024}});

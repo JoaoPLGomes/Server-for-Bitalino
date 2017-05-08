@@ -8,6 +8,7 @@ import threading
 from random import randint
 import bitalino
 import json
+from pprint import pprint
 
 
 macAddress = ""
@@ -39,7 +40,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		connections.add(self)
 		print 'New connection was opened'
 		
-		self.write_message("Conn!")
+		#self.write_message("Conn!")
 
 
 	
@@ -129,16 +130,19 @@ def read_function():
 				try:
 					if not device.started :
 						print "here 1 "
-						print samplingRate
-						print acqChannels
+
 						device.start(samplingRate,acqChannels)
 						print "here 2"
-					data = device.read(nSamples)
-					print "here3"
+						
+					
+					data = json.dumps(device.read(nSamples).tolist())
+
+					
+					
 					[client.write_message(str(data)) for client in connections]
 
 				except Exception as e:
-					print "ERRO"
+					print str(e)
 					toStop = True
 					[client.write_message(str(e)) for client in connections]
 
