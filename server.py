@@ -125,7 +125,7 @@ def read_function():
 				except Exception as e:
 					print e
 					[client.write_message("Could not connect to Bitalino !") for client in connections]
-
+					
 				
 			else :
 				try:

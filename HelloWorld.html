@@ -115,15 +115,30 @@ function closeNav() {
             log("Message Received: " + evt.data)
             
             var dados = evt.data.split(',')
-            console.log( dados[0])
+            
             var d1 = [];
+            var d2= [];
                 for (var i = 0; i < dados.length; i += 1)
                     
                     d1.push([i, dados[5]]);
-                
-                $.plot($("#placeholder"), [ d1 ], {yaxis: {
+                  console.log( dados[6])
+                    d2.push([i, dados[6]]);
+
+                $.plot($("#placeholder2"), [ d2 ], {yaxis: {
               min:0, max: 1024}});
             
+                
+                $.plot($("#placeholder1"), [ d1 ], {yaxis: {
+              min:0, max: 1024}});
+
+                
+
+
+                  
+
+
+
+
             };
  
           // Close Websocket callback
@@ -199,8 +214,9 @@ function closeNav() {
     </div>
 
     <div><h1>BITalinoWS</h1></div>
-    <div id="placeholder" style="width:600px;height:300px;"></div> 
-
+    <div id="placeholder2" style="width:600px;height:300px;"></div> 
+    <div id="placeholder1" style="width:600px;height:300px;"></div> 
+    
     
         
    
