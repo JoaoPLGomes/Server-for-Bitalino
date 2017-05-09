@@ -94,9 +94,10 @@ def stopDevice():
 	if device.started :
 		try:
 			device.stop()
-		except Exception as e:
-			close()
+			device.close()
 			device = ""
+		except Exception as e:
+			print e
 	else:	
 		device.close()
 		device = ""
@@ -109,8 +110,8 @@ def read_function():
 	while True:
 		
 		if toStop :
-			
-			stopDevice()
+			if type(device) == bitalino.BITalino :
+				stopDevice()
 			toStop = False
 
 		elif len(connections) >= 1:
@@ -122,7 +123,7 @@ def read_function():
 					device = bitalino.BITalino(macAddress)
 					print "Chega aqui 2 "
 				except Exception as e:
-					
+					print e
 					[client.write_message("Could not connect to Bitalino !") for client in connections]
 
 				
@@ -139,7 +140,7 @@ def read_function():
 
 					
 					
-					[client.write_message(str(data)) for client in connections]
+					[client.write_message(data) for client in connections]
 
 				except Exception as e:
 					print str(e)
