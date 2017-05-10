@@ -68,9 +68,9 @@
 #terminal {
   color:white;
 }
-
-
     </style>
+
+
     <script type="text/javascript">
 
       /* Set the width of the side navigation to 250px and the left margin of the page content to 250px and add a black background color to body */
@@ -118,26 +118,60 @@ function closeNav() {
             
             var d1 = [];
             var d2= [];
-                for (var i = 0; i < dados.length; i += 1)
+            var d3 = [];
+            var d4= [];
+            var d5 = [];
+            var d6= [];
+                for (var i = 0; i < dados.length; i += 1){
+                    if ($("#graph1").is(":checked")){
+                      d1.push([i, dados[5]]);
+                    }
+                    if ($("#graph2").is(":checked")){
+                      d2.push([i, dados[6]]);
+                    }
+                    if ($("#graph3").is(":checked")){
+                      d3.push([i, dados[7]]);
+                    }
+                    if ($("#graph4").is(":checked")){
+                      d4.push([i, dados[8]]);
+                    }
+                    if ($("#graph5").is(":checked")){
+                      d5.push([i, dados[9]]);
+                    }
+                    if ($("#graph6").is(":checked")){
+                      d6.push([i, dados[10]]);
+                    }
+                    }
                     
-                    d1.push([i, dados[5]]);
-                  console.log( dados[6])
-                    d2.push([i, dados[6]]);
-
+                    if ($("#graph2").is(":checked")){
                 $.plot($("#placeholder2"), [ d2 ], {yaxis: {
               min:0, max: 1024}});
-            
+            }
                 
+               if ($("#graph1").is(":checked")){
                 $.plot($("#placeholder1"), [ d1 ], {yaxis: {
               min:0, max: 1024}});
+            }
 
+               if ($("#graph3").is(":checked")){
+                $.plot($("#placeholder3"), [ d3 ], {yaxis: {
+              min:0, max: 1024}});
+            }
                 
+               if ($("#graph4").is(":checked")){
+                $.plot($("#placeholder4"), [ d4 ], {yaxis: {
+              min:0, max: 1024}});
+            }
 
-
-                  
-
-
-
+               if ($("#graph5").is(":checked")){
+                $.plot($("#placeholder5"), [ d5 ], {yaxis: {
+              min:0, max: 1024}});
+            }
+                
+               if ($("#graph6").is(":checked")){
+                $.plot($("#placeholder6"), [ d6 ], {yaxis: {
+              min:0, max: 1024}});
+            }
 
             };
  
@@ -159,6 +193,7 @@ function closeNav() {
             $("#uri").css("background", "#00ff00");
             $("div#message_details").show();
             log("***Connection Opened***");
+            
           };
         });
  
@@ -200,9 +235,18 @@ function closeNav() {
       <input type="text" id="port" value="65" style="background:#ff0000;"/><br />
       <label for="uri">uri:</label>
       <input type="text" id="uri" value="/ws" style="background:#ff0000;"/><br />
+
+  <input type="checkbox"  id="graph1"> 
+  <input type="checkbox"  id="graph2"> 
+  <input type="checkbox"  id="graph3"> 
+  <input type="checkbox"  id="graph4"> 
+  <input type="checkbox"  id="graph5"> 
+  <input type="checkbox"  id="graph6">
+  <br>
+
       <button type="submit" id="open" > Open </button>
       <!-- Use any element to open the sidenav -->
-<button onclick="openNav()">Logs</button>
+      <button onclick="openNav()">Logs</button>
 
     </div>
     <div id="message_details">
@@ -212,14 +256,19 @@ function closeNav() {
         <input type="submit" id="send" value="send" />
         <input type="submit" id="receber" value="receber" />
     </div>
-
+    <form action="">
+    
+    
+        </form>
     <div><h1>BITalinoWS</h1></div>
+    <div id="placeholder6" style="width:600px;height:300px;"></div> 
+    <div id="placeholder5" style="width:600px;height:300px;"></div> 
+    <div id="placeholder4" style="width:600px;height:300px;"></div> 
+    <div id="placeholder3" style="width:600px;height:300px;"></div> 
     <div id="placeholder2" style="width:600px;height:300px;"></div> 
     <div id="placeholder1" style="width:600px;height:300px;"></div> 
-    
-    
+
         
-   
 
 
 </div>
