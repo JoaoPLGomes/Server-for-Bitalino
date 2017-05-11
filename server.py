@@ -8,7 +8,8 @@ import threading
 from random import randint
 import bitalino
 import json
-from pprint import pprint
+import connectionClass
+
 
 
 macAddress = ""
@@ -24,10 +25,10 @@ This program will echo back the reverse of whatever it recieves.
 Messages are output to the terminal for debuggin purposes.
 ''' 
 threads = [] #Array with threads
-connections = set() #Clients that are connected
+
 device = ""
 toStop = False
-
+connections2 = [] #Clients that are connected
 
 class WSHandler(tornado.websocket.WebSocketHandler):
 	
@@ -37,7 +38,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		return True
 
 	def open(self):
-		connections.add(self)
+		
+		
+		connections2.append(connectionClass.Connection(self))
+		print connections2
 		print 'New connection was opened'
 		
 		#self.write_message("Conn!")
@@ -45,18 +49,26 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 	
 	def on_message(self, message):
-
-		
+		if type(message) == unicode:
+			print type(message)
+			print message
+			for val in connections2:
+				
+				val.set_sizeScreen(message)
+				
 		self.write_message(message)
 		
 			
 
 
 	def on_close(self):
-		connections.remove(self)
+		for val in connections2:
+			if val.get_connection():
+
+				connections2.remove(val)
 		print 'Conn closed...'
 		
-		if len(connections) == 0:
+		if len(connections2) == 0:
 			
 			global toStop 
 			toStop = True
@@ -114,7 +126,7 @@ def read_function():
 				stopDevice()
 			toStop = False
 
-		elif len(connections) >= 1:
+		elif len(connections2) >= 1:
 
 			if not type(device) == bitalino.BITalino :
 				
@@ -124,7 +136,7 @@ def read_function():
 					print "Chega aqui 2 "
 				except Exception as e:
 					print e
-					[client.write_message("Could not connect to Bitalino !") for client in connections]
+					[client.get_connection().write_message("Could not connect to Bitalino !") for client in connections2]
 					
 				
 			else :
@@ -136,16 +148,21 @@ def read_function():
 						print "here 2"
 						
 					
-					data = json.dumps(device.read(nSamples).tolist())
+					#data = json.dumps(device.read(nSamples).tolist())
+					data = device.read(nSamples).tolist()
+					
+					
+					#[client.get_connection().write_message(data[::client.get_divider()]) for client in connections2]
+					for client in connections2 :
 
-					
-					
-					[client.write_message(data) for client in connections]
+						data = data[::client.get_divider()]
+						data = json.dumps(data)
+						client.get_connection().write_message(data)
 
 				except Exception as e:
 					print str(e)
 					toStop = True
-					[client.write_message(str(e)) for client in connections]
+					[client.get_connection().write_message(str(e)) for client in connections2]
 
 
 application = tornado.web.Application([

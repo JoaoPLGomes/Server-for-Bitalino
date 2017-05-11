@@ -99,6 +99,7 @@ function closeNav() {
         $("div#message_details").hide()
  
         var ws;
+        
  
         $("#open").click(function(evt) {
           evt.preventDefault();
@@ -109,11 +110,13 @@ function closeNav() {
  
           // create websocket instance
           ws = new WebSocket("ws://" + host + ":" + port + uri);
+
            
           // Handle incoming websocket message callback
           ws.onmessage = function(evt) {
             log("Message Received: " + evt.data)
-            
+
+
             var dados = evt.data.split(',')
             
             var d1 = [];
@@ -122,6 +125,8 @@ function closeNav() {
             var d4= [];
             var d5 = [];
             var d6= [];
+
+
                 for (var i = 0; i < dados.length; i += 1){
                     if ($("#graph1").is(":checked")){
                       d1.push([i, dados[5]]);
@@ -142,7 +147,8 @@ function closeNav() {
                       d6.push([i, dados[10]]);
                     }
                     }
-                    
+
+                    console.log(d1.length)
                     if ($("#graph2").is(":checked")){
                 $.plot($("#placeholder2"), [ d2 ], {yaxis: {
               min:0, max: 1024}});
@@ -193,6 +199,7 @@ function closeNav() {
             $("#uri").css("background", "#00ff00");
             $("div#message_details").show();
             log("***Connection Opened***");
+            ws.send($("#placeholder1").width())
             
           };
         });
