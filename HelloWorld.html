@@ -128,6 +128,7 @@ function closeNav() {
 
 
                 for (var i = 0; i < dados.length; i += 1){
+                  
                     if ($("#graph1").is(":checked")){
                       d1.push([i, dados[5]]);
                     }
@@ -144,11 +145,11 @@ function closeNav() {
                       d5.push([i, dados[9]]);
                     }
                     if ($("#graph6").is(":checked")){
-                      d6.push([i, dados[10]]);
+                      d6.push([i, dados[10].slice(0,4)]);
                     }
                     }
 
-                    console.log(d1.length)
+                    
                     if ($("#graph2").is(":checked")){
                 $.plot($("#placeholder2"), [ d2 ], {yaxis: {
               min:0, max: 1024}});
