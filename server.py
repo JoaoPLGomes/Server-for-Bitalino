@@ -28,7 +28,7 @@ threads = [] #Array with threads
 
 device = ""
 toStop = False
-connections2 = [] #Clients that are connected
+connections = [] #Clients that are connected
 
 class WSHandler(tornado.websocket.WebSocketHandler):
 	
@@ -40,8 +40,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		
 		
-		connections2.append(connectionClass.Connection(self))
-		print connections2
+		connections.append(connectionClass.Connection(self))
+		print connections
 		print 'New connection was opened'
 		
 		#self.write_message("Conn!")
@@ -52,7 +52,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 		if type(message) == unicode:
 			print type(message)
 			print message
-			for val in connections2:
+			for val in connections:
 				
 				val.set_sizeScreen(message)
 				
@@ -62,13 +62,13 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
 	def on_close(self):
-		for val in connections2:
+		for val in connections:
 			if val.get_connection():
 
-				connections2.remove(val)
+				connections.remove(val)
 		print 'Conn closed...'
 		
-		if len(connections2) == 0:
+		if len(connections) == 0:
 			
 			global toStop 
 			toStop = True
@@ -126,7 +126,7 @@ def read_function():
 				stopDevice()
 			toStop = False
 
-		elif len(connections2) >= 1:
+		elif len(connections) >= 1:
 
 			if not type(device) == bitalino.BITalino :
 				
@@ -136,7 +136,7 @@ def read_function():
 					print "Chega aqui 2 "
 				except Exception as e:
 					print e
-					[client.get_connection().write_message("Could not connect to Bitalino !") for client in connections2]
+					[client.get_connection().write_message("Could not connect to Bitalino !") for client in connections]
 					
 				
 			else :
@@ -152,17 +152,21 @@ def read_function():
 					data = device.read(nSamples).tolist()
 					
 					
-					#[client.get_connection().write_message(data[::client.get_divider()]) for client in connections2]
-					for client in connections2 :
+					#[client.get_connection().write_message(data[::client.get_divider()]) for client in connections]
+					for client in connections :
 
-						data = data[::client.get_divider()]
-						data = json.dumps(data)
-						client.get_connection().write_message(data)
+						dataToSend = data[::client.get_divider()]
+
+						dataToSend = json.dumps(dataToSend)
+
+						client.get_connection().write_message(dataToSend)
+
 
 				except Exception as e:
-					print str(e)
+					
+					
+					[client.get_connection().write_message("Erro de coneccao") for client in connections]
 					toStop = True
-					[client.get_connection().write_message(str(e)) for client in connections2]
 
 
 application = tornado.web.Application([
