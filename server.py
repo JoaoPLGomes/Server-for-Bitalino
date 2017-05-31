@@ -147,19 +147,21 @@ def read_function():
 						device.start(samplingRate,acqChannels)
 						print "here 2"
 						
-					
-					#data = json.dumps(device.read(nSamples).tolist())
+				
+						#data = json.dumps(device.read(nSamples).tolist())
 					data = device.read(nSamples).tolist()
-					
-					
+					print nSamples
 					#[client.get_connection().write_message(data[::client.get_divider()]) for client in connections]
 					for client in connections :
+						
+						if client.get_divider() != -1:
+							data = data[::client.get_divider()]
+							
+						
+						data = json.dumps(data)
+						
 
-						dataToSend = data[::client.get_divider()]
-
-						dataToSend = json.dumps(dataToSend)
-
-						client.get_connection().write_message(dataToSend)
+						client.get_connection().write_message(data)
 
 
 				except Exception as e:

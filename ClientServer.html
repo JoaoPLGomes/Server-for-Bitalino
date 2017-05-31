@@ -91,7 +91,7 @@ function closeNav() {
  
       // log function
       log = function(data){
-        $("div#terminal").prepend("</br>" +data);
+        $("div#terminal").prepend("</br>"+data);
        // console.log(String(data));
       };
  
@@ -114,11 +114,11 @@ function closeNav() {
            
           // Handle incoming websocket message callback
           ws.onmessage = function(evt) {
-            log("Message Received: " + evt.data)
-
-
-            var dados = evt.data.split(',')
+            log("Message Received: " + evt.data.length);
             
+
+            var dados = evt.data.split(',');
+            console.log(dados);
             var d1 = [];
             var d2= [];
             var d3 = [];
