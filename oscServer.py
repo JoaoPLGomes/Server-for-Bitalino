@@ -1,4 +1,4 @@
-import OSC, threading, json,bitalino
+import OSC, threading, json,bitalino, numpy
 
 macAddress = ""
 acqChannels = []
@@ -7,7 +7,8 @@ nSamples = 0
 digitalOutput = []
 device = ""
 #receive_address = ('192.168.1.5', 12035) 
-send_address = '192.168.1.5', 8000
+#send_address = '192.168.1.5', 8888
+send_address = '127.0.0.1', 8888
 threads = [] #Array with threads
 
 def getJsonInfo():
@@ -49,7 +50,7 @@ def send_osc(addr, *stuff):
 
 def read_function():
   global device
-
+  zeros = [float(0.0)] * 21
   
   while True:
     
@@ -61,7 +62,7 @@ def read_function():
         device = bitalino.BITalino(macAddress)
         print "Chega aqui 2 "
       except Exception as e:
-        print e
+        print e 
         device = ""
           
         
@@ -75,11 +76,11 @@ def read_function():
             
         
             #data = json.dumps(device.read(nSamples).tolist())
-        data = device.read(nSamples).tolist()
+        data = device.read(nSamples)
 
         for i in range(0,nSamples,5):
-          send_osc("/0/raw", [0] * 11)
-          send_osc("/0/bitalino",data[i])
+          send_osc("/0/raw", zeros)
+          send_osc("/0/bitalino",data[i,:].astype('float'))
 
       except Exception as e:
 

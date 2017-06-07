@@ -1,4 +1,4 @@
-import json
+import server
 
 
 class Connection:
@@ -7,13 +7,8 @@ class Connection:
 		self.sizeScreen = 2750
 		self.connection = conection
 		self.macAddress = 0
-		self.nSamples = 0
-		with open('variables.json') as data_file:    
-			data = json.load(data_file)
-			for a in data :
-				self.macAddress = a
-				break
-			self.nSamples = data[self.macAddress]["nSamples"]
+		self.nSamples = server.nSamples
+		
 
 	def get_sizeScreen(self):
 		return self.sizeScreen
