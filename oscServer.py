@@ -6,10 +6,12 @@ samplingRate = 0
 nSamples = 0
 digitalOutput = []
 device = ""
+nStop = 0
 #receive_address = ('192.168.1.5', 12035) 
-#send_address = '192.168.1.5', 8888
-send_address = '127.0.0.1', 8888
+send_address = '192.168.1.5', 8888
+#send_address = '127.0.0.1', 8888
 threads = [] #Array with threads
+contador =  0
 
 def getJsonInfo():
 
@@ -18,7 +20,7 @@ def getJsonInfo():
   global samplingRate
   global nSamples
   global digitalOutput
-
+  global nStop
 
   with open('variables.json') as data_file:    
     data = json.load(data_file)
@@ -27,8 +29,6 @@ def getJsonInfo():
       break
 
     
-    
-
     for i in data[macAddress]["acqChannels"] :
       acqChannels.append(i-1)
 
@@ -36,6 +36,7 @@ def getJsonInfo():
     nSamples = data[macAddress]["nSamples"]
     for i in data[macAddress]["digitalOutput"] :
       digitalOutput.append(int(i))
+    nStop = data[macAddress]["nStop"]
 
 
 
@@ -48,8 +49,26 @@ def send_osc(addr, *stuff):
     c.send(msg)
 
 
+def stopDevice():
+  global device 
+  if type(device) == bitalino.BITalino :
+    if device.started :
+      try:
+        device.stop()
+        device.close()
+        device = ""
+
+      except Exception as e:
+        print e
+    else: 
+      device.close()
+      device = ""
+
+
 def read_function():
   global device
+  global contador
+  global nStop
   zeros = [float(0.0)] * 21
   
   while True:
@@ -61,9 +80,14 @@ def read_function():
         print "Chega aqui 1 "
         device = bitalino.BITalino(macAddress)
         print "Chega aqui 2 "
+        contador = 0
       except Exception as e:
         print e 
         device = ""
+        contador +=1
+        if contador == nStop : 
+          stopDevice()
+          return;
           
         
     else :
@@ -86,6 +110,10 @@ def read_function():
 
         print e
         device = ""
+        contador +=1
+        if contador == nStop : 
+          stopDevice()
+          return;
 
 
 
