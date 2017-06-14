@@ -159,7 +159,12 @@ def read_function():
 							
 						
 						data = json.dumps(data)
-						
+						#labels=['nSeq', 'I1', 'I2', 'O1', 'O2','A1','A2']
+						#msg="{"
+						#for c in range(shape(data,1)):
+						#	msg+="'"+labels[c]+"':"+data[:,c]+","
+						#msg=msg[:-1]+"}"
+						#data = json.dumps(msg)
 
 						client.get_connection().write_message(data)
 
